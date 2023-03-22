@@ -28,8 +28,38 @@ app.use(express.urlencoded({
   extended: true
 }));
 
-// ADD HERE THE REST OF THE ENDPOINTS
+function findUser(email) {
+  const results = db.data.users.filter(u => u.email === email);
+  if (results.length === 0) return;
+  return results[0];
+};
 
+// ADD HERE THE REST OF THE ENDPOINTS
+app.post("/auth/register", (req, res) => {
+  const { name, email, password } = req.body;
+  
+  // hashing password
+  const salt = bcrypt.genSaltSync(10);
+  const hashedPassword = bcrypt.hashSync(password, salt);
+
+  // TODO: data validation 
+  const user = {
+    name,
+    email,
+    password: hashedPassword,
+  };
+
+  const userFound = findUser(email);
+  if (userFound) {
+    // user already exists
+    res.send({ ok: false, message: 'User already exists' });
+  } else {
+    // user is unique
+    db.data.users.push(user);
+    db.write();
+    res.send({ ok: true });
+  };
+});
 
 
 app.get("*", (req, res) => {
