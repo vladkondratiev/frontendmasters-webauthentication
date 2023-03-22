@@ -14,6 +14,12 @@ const Auth = {
             alert(response.message);
         }
     },
+    logout() {
+        Auth.isLoggedIn = false;
+        Auth.account = null;
+        Auth.updateStatus();
+        Router.go("/");
+    },
     register: async (event) => {
         event.preventDefault();
         const user = {
