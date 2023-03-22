@@ -35,6 +35,22 @@ function findUser(email) {
 };
 
 // ADD HERE THE REST OF THE ENDPOINTS
+app.post("/auth/login", (req, res) => {
+  const { email, password } = req.body;
+  const userFound = findUser(email);
+  if (userFound) {
+    // user found, check the password
+    if (bcrypt.compareSync(password, userFound.password)) {
+      res.send({ ok: true, name: userFound.name, email: userFound.email });
+    } else {
+      res.send({ ok: false, message: "Credentials are wrong" });
+    }
+  } else {
+    // user not found
+    res.send({ ok: false, message: "Credentials are wrong" })
+  }
+});
+
 app.post("/auth/register", (req, res) => {
   const { name, email, password } = req.body;
   
@@ -52,7 +68,7 @@ app.post("/auth/register", (req, res) => {
   const userFound = findUser(email);
   if (userFound) {
     // user already exists
-    res.send({ ok: false, message: 'User already exists' });
+    res.send({ ok: false, message: "User already exists" });
   } else {
     // user is unique
     db.data.users.push(user);
